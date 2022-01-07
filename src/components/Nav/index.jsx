@@ -12,7 +12,7 @@ import {
   HelpIconG,
   ChangeIconG,
   SwapIconG,
-} from "../Icons/";
+} from "../Icons/styles";
 
 // COMPONENTS
 import {

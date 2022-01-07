@@ -2,16 +2,20 @@ import { Component } from "react";
 
 import {
   Content,
-  ContentItem1,
-  ContentItem2,
-  CtItem1Title,
+  ContentJourney,
+  ContentTable,
   CtItemJourney,
-  JourneyCol1,
-  JourneyCol2,
-  JourneyCol2Row,
-  JourneyColName,
   JourneyColQuant,
   JourneyRows,
+  TableFilter,
+  TdDest,
+  TdNome,
+  TdSss,
+  TdStts,
+  ThDest,
+  ThNome,
+  ThSss,
+  ThStts,
 } from "./styles";
 
 import {
@@ -21,7 +25,7 @@ import {
   ConfigIconM,
   IdleIconM,
   CheckedIconM,
-} from "../../Icons";
+} from "../../Icons/styles";
 
 // eslint-disable-next-line
 export class ContentContainer extends Component {
@@ -29,52 +33,102 @@ export class ContentContainer extends Component {
     super(props);
     this.state = {
       filter: [],
+      table: [],
+      icons: [
+        { content: AllIconM },
+        { content: SendIconM },
+        { content: OnIconM },
+        { content: ConfigIconM },
+        { content: IdleIconM },
+        { content: CheckedIconM },
+      ],
+      status: 0,
     };
   }
 
   componentDidMount() {
-    fetch("https://api-d1-test.herokuapp.com/api/filter")
-      .then((response) => response.json())
-      .then((filter) => this.setState({ filter }));
+    this.loadFilters();
+    this.loadTable();
   }
 
+  loadFilters = async () => {
+    const { icons } = this.state;
+    const filterResponse = fetch(
+      "https://api-d1-test.herokuapp.com/api/filter"
+    );
+
+    const [filter] = await Promise.all([filterResponse]);
+
+    const filterJson = await filter.json();
+
+    const filterAndIcons = filterJson.map((filter, index) => {
+      return { ...filter, cover: icons[index].content };
+    });
+
+    this.setState({ filter: filterAndIcons });
+  };
+
+  loadTable = async () => {
+    const tableResponse = fetch(
+      "https://api-d1-test.herokuapp.com/api/journey"
+    );
+
+    const [table] = await Promise.all([tableResponse]);
+
+    const tableJson = await table.json();
+
+    this.setState({ table: tableJson });
+  };
+
   render() {
+    const { table } = this.state;
     const { filter } = this.state;
+
     return (
       <Content>
         {/*JORNADAS */}
-        <ContentItem1>
-          <CtItem1Title> Jornadas </CtItem1Title>
+        <ContentJourney>
+          <h3> Jornadas </h3>
           <CtItemJourney>
-            <JourneyRows>
-              <JourneyCol1>
-                {AllIconM}
-                {SendIconM}
-                {OnIconM}
-                {ConfigIconM}
-                {IdleIconM}
-                {CheckedIconM}
-              </JourneyCol1>
-              <JourneyCol2>
-                {filter.map((filterItem) => (
-                  <div key={filterItem.id}>
-                    <JourneyCol2Row>
-                      <JourneyColName>{filterItem.name}</JourneyColName>
-                      <JourneyColQuant>
-                        <p>{filterItem.quantity}</p>
-                      </JourneyColQuant>
-                    </JourneyCol2Row>
-                  </div>
-                ))}
-              </JourneyCol2>
-            </JourneyRows>
+            {filter.map((filterItem) => (
+              <div key={filterItem.id}>
+                <JourneyRows>
+                  {filterItem.cover}
+                  <p> {filterItem.name} </p>
+                  <JourneyColQuant> {filterItem.quantity} </JourneyColQuant>
+                </JourneyRows>
+              </div>
+            ))}
           </CtItemJourney>
-        </ContentItem1>
+        </ContentJourney>
 
         {/* TABLE*/}
-        <ContentItem2>
-          <p>Table</p>
-        </ContentItem2>
+        <ContentTable>
+          <TableFilter>
+            <thead>
+              <ThNome> Nome </ThNome>
+              <ThDest> Destinatários </ThDest>
+              <ThSss> Sucesso </ThSss>
+              <ThStts> Status </ThStts>
+            </thead>
+            <tbody>
+              {table.map((tableItem) => (
+                <tr key={tableItem.id}>
+                  <TdNome> {tableItem.name} </TdNome>
+
+                  <TdDest> {tableItem.recipients} </TdDest>
+
+                  <TdSss> {tableItem.success} </TdSss>
+
+                  <TdStts>
+                    <div> {filter[tableItem.status].cover} </div>
+                    <div> {filter[tableItem.status].name} </div>
+                  </TdStts>
+                </tr>
+              ))}
+            </tbody>
+          </TableFilter>
+        </ContentTable>
       </Content>
     );
   }

@@ -4,35 +4,9 @@ const Icon = styled.i`
   color: ${(props) => props.color};
 `;
 
-/* ICONS STATUS */
-
-export const SendIconP = (
-  <Icon color="#C1CA4F">
-    <i className="las la-paper-plane"></i>
-  </Icon>
-);
-
-export const ConfigIconP = (
-  <Icon color="#3FA8F4">
-    <i className="las la-pen"></i>
-  </Icon>
-);
-
-export const IdleIconP = (
-  <Icon color="#EBBD3E">
-    <i className="las la-bed"></i>
-  </Icon>
-);
-
 /* ICONS JORNADAS */
 
-const IconM = styled(Icon)`
-  margin-bottom: 10px;
-  &:hover {
-    color: ${(props) => props.theme.colors.mainTxtActive};
-    transition: 0.4s;
-  }
-`;
+const IconM = styled(Icon)``;
 
 export const AllIconM = (
   <IconM color="#D190DD">

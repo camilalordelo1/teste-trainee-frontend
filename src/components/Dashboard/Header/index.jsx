@@ -1,7 +1,6 @@
 import React from "react";
 
 import {
-  ButtonHeader,
   DivImgHeader,
   Header,
   HeaderItem1,
@@ -12,8 +11,14 @@ import {
 } from "./styles";
 
 import ImgHeaderPng from "../../../assets/img/acme2.png";
+import { BtnHeaderComponente } from "./BtnHeaderComponente";
 
 export class HeaderContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     return (
       <Header>
@@ -26,11 +31,11 @@ export class HeaderContainer extends React.Component {
           </DivImgHeader>
         </HeaderItem1>
         <HeaderItem2>
-          <InputHeader></InputHeader>
-          <ButtonHeader>
-            <i className="las la-plus"></i>
-            <p> Nova Jornada </p>
-          </ButtonHeader>
+          <div>
+            <i className="las la-search"></i>
+          </div>
+          <InputHeader placeholder="Buscar"></InputHeader>
+          <BtnHeaderComponente />
         </HeaderItem2>
       </Header>
     );

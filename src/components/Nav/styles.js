@@ -21,6 +21,9 @@ export const NavDiv = styled.div`
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  i:hover {
+    color: ${(props) => props.theme.colors.mainActive};
+  }
 `;
 
 export const NavDiv2 = styled(NavDiv)`

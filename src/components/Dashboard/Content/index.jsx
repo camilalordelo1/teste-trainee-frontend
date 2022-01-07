@@ -1,31 +1,22 @@
 import { Component } from "react";
 
+import { Filters } from "./Filters";
+import { Table } from "./Table";
+
+import { loadFilters } from "../../../utils/loadFilters";
+import { loadTable } from "../../../utils/loadTable";
+
 import {
   Content,
   ContentJourney,
   ContentTable,
   CtItemJourney,
-  JourneyColQuant,
-  JourneyRows,
   TableFilter,
-  TdDest,
-  TdNome,
-  TdSss,
-  TdStts,
   ThDest,
   ThNome,
   ThSss,
   ThStts,
 } from "./styles";
-
-import {
-  AllIconM,
-  SendIconM,
-  OnIconM,
-  ConfigIconM,
-  IdleIconM,
-  CheckedIconM,
-} from "../../Icons/styles";
 
 // eslint-disable-next-line
 export class ContentContainer extends Component {
@@ -34,50 +25,42 @@ export class ContentContainer extends Component {
     this.state = {
       filter: [],
       table: [],
-      icons: [
-        { content: AllIconM },
-        { content: SendIconM },
-        { content: OnIconM },
-        { content: ConfigIconM },
-        { content: IdleIconM },
-        { content: CheckedIconM },
-      ],
       status: 0,
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  componentDidMount() {
-    this.loadFilters();
-    this.loadTable();
+  async componentDidMount() {
+    await this.loadFilters();
+    await this.loadTable();
   }
 
   loadFilters = async () => {
-    const { icons } = this.state;
-    const filterResponse = fetch(
-      "https://api-d1-test.herokuapp.com/api/filter"
-    );
-
-    const [filter] = await Promise.all([filterResponse]);
-
-    const filterJson = await filter.json();
-
-    const filterAndIcons = filterJson.map((filter, index) => {
-      return { ...filter, cover: icons[index].content };
-    });
-
+    const filterAndIcons = await loadFilters();
     this.setState({ filter: filterAndIcons });
   };
 
   loadTable = async () => {
-    const tableResponse = fetch(
-      "https://api-d1-test.herokuapp.com/api/journey"
-    );
-
-    const [table] = await Promise.all([tableResponse]);
-
-    const tableJson = await table.json();
-
+    const tableJson = await loadTable();
     this.setState({ table: tableJson });
+  };
+
+  handleClick = async (props) => {
+    if (props == 0) {
+      this.loadTable();
+    } else {
+      const urlFilterActive =
+        "https://api-d1-test.herokuapp.com/api/journey/" + props;
+
+      const filterActiveResponse = fetch(urlFilterActive);
+
+      const [filterActive] = await Promise.all([filterActiveResponse]);
+
+      const filterActiveJson = await filterActive.json();
+
+      console.log(filterActiveJson);
+      this.setState({ table: filterActiveJson });
+    }
   };
 
   render() {
@@ -91,12 +74,11 @@ export class ContentContainer extends Component {
           <h3> Jornadas </h3>
           <CtItemJourney>
             {filter.map((filterItem) => (
-              <div key={filterItem.id}>
-                <JourneyRows>
-                  {filterItem.cover}
-                  <p> {filterItem.name} </p>
-                  <JourneyColQuant> {filterItem.quantity} </JourneyColQuant>
-                </JourneyRows>
+              <div
+                key={filterItem.id}
+                onClick={() => this.handleClick(filterItem.id)}
+              >
+                <Filters filterItem={filterItem} table={table} />
               </div>
             ))}
           </CtItemJourney>
@@ -114,16 +96,7 @@ export class ContentContainer extends Component {
             <tbody>
               {table.map((tableItem) => (
                 <tr key={tableItem.id}>
-                  <TdNome> {tableItem.name} </TdNome>
-
-                  <TdDest> {tableItem.recipients} </TdDest>
-
-                  <TdSss> {tableItem.success} </TdSss>
-
-                  <TdStts>
-                    <div> {filter[tableItem.status].cover} </div>
-                    <div> {filter[tableItem.status].name} </div>
-                  </TdStts>
+                  <Table tableItem={tableItem} filter={filter} />
                 </tr>
               ))}
             </tbody>
